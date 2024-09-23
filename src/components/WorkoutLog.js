@@ -8,7 +8,7 @@ function WorkoutLog({ workouts }) {
           ) : (
             workouts.map((workout, index) => (
               <li key={index} className="mb-2">
-                {workout.exercise} - {workout.weight} lbs x {workout.reps} reps
+                {workout.exercise} - {workout.weight} kgs x {workout.reps} reps
               </li>
             ))
           )}
