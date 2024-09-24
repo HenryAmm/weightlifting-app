@@ -9,11 +9,11 @@ const PORT = process.env.PORT || 5001;  // Use Heroku's port or 5001 for local
 // Middleware to parse JSON
 app.use(express.json());
 
-// CORS settings
+// CORS settings - allow localhost and Netlify origin
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://henchry.netlify.app'],  // Allow local and Netlify origins
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Define allowed HTTP methods
-  credentials: true,  // Allow credentials (cookies, etc.)
+  origin: ['http://localhost:3000', 'https://henchry.netlify.app'],  // Replace this with your Netlify URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allow only necessary HTTP methods
+  credentials: true  // Allow credentials if necessary (e.g., for cookies)
 }));
 
 // MongoDB connection
