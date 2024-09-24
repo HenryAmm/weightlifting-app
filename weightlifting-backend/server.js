@@ -26,15 +26,27 @@ mongoose.connect(MONGO_URI, {
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => {
     console.error('Error connecting to MongoDB', err);
-    process.exit(1);  // Exit with failure
+    process.exit(1);  // Exit with failure if MongoDB connection fails
   });
 
-// Define a Workout Schema
+// Define Workout Schema
 const workoutSchema = new mongoose.Schema({
-  exercise: String,
-  weight: Number,
-  reps: Number,
-  date: { type: Date, default: Date.now },
+  exercise: {
+    type: String,
+    required: true,
+  },
+  weight: {
+    type: Number,
+    required: true,
+  },
+  reps: {
+    type: Number,
+    required: true,
+  },
+  date: { 
+    type: Date, 
+    default: Date.now 
+  },
 });
 
 const Workout = mongoose.model('Workout', workoutSchema);
@@ -53,10 +65,17 @@ app.get('/api/workouts', async (req, res) => {
 
 // POST: Add a new workout
 app.post('/api/workouts', async (req, res) => {
+  const { exercise, weight, reps } = req.body;
+  
+  // Validate request data
+  if (!exercise || !weight || !reps) {
+    return res.status(400).json({ message: 'Please include exercise, weight, and reps.' });
+  }
+
   const workout = new Workout({
-    exercise: req.body.exercise,
-    weight: req.body.weight,
-    reps: req.body.reps,
+    exercise,
+    weight,
+    reps,
   });
 
   try {
@@ -67,7 +86,7 @@ app.post('/api/workouts', async (req, res) => {
   }
 });
 
-// Root route
+// Root route for health check
 app.get('/', (req, res) => {
   res.send('Weightlifting API is running');
 });
