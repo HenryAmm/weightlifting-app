@@ -8,13 +8,16 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
+  // Get the API URL from environment variables
+  const API_URL = process.env.REACT_APP_API_URL;
+
   const [workouts, setWorkouts] = useState([]);
 
   // Fetch workouts from the backend
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/workouts');
+        const response = await axios.get(`${API_URL}/api/workouts`);
         setWorkouts(response.data);
       } catch (error) {
         console.error('Error fetching workouts:', error);
@@ -22,12 +25,12 @@ function App() {
     };
 
     fetchWorkouts();
-  }, []);
+  }, [API_URL]);
 
-  // Post new workout to the backend
+  // Submit new workout to the backend
   const handleWorkoutSubmit = async (newWorkout) => {
     try {
-      const response = await axios.post('http://localhost:5001/api/workouts', newWorkout);
+      const response = await axios.post(`${API_URL}/api/workouts`, newWorkout);
       setWorkouts([...workouts, response.data]);
     } catch (error) {
       console.error('Error adding workout:', error);
