@@ -1,17 +1,21 @@
 {
   "name": "weightlifting-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",  // Ensure this matches your actual main file (server.js or index.js)
   "scripts": {
+    "start": "node server.js",  // Add the start script to run the server
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Backend for the Weightlifting App",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "mongoose": "^8.6.3"
+  },
+  "engines": {
+    "node": "14.x"  // Specify the Node version to use on Heroku
   }
 }
