@@ -4,30 +4,30 @@ const cors = require('cors');
 
 // Initialize Express
 const app = express();
-const PORT = process.env.PORT || 5001;  // Use Heroku's port or 5001 for local
+const PORT = process.env.PORT || 5001;  // Use Heroku's dynamic port or 5001 for local development
 
 // Middleware to parse JSON
 app.use(express.json());
 
 // CORS settings - allow localhost and Netlify origin
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://henchry.netlify.app'],  // Replace this with your Netlify URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allow only necessary HTTP methods
-  credentials: true  // Allow credentials if necessary (e.g., for cookies)
+  origin: ['http://localhost:3000', 'https://henchry.netlify.app'],  // Allow localhost for dev and Netlify for production
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allow necessary HTTP methods
+  credentials: true  // Allow credentials if needed (e.g., for cookies, authentication)
 }));
 
 // MongoDB connection
-mongoose.connect('mongodb+srv://henryamm:S9uiDgm6kXWf505N@cluster0.q8luy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://henryamm:S9uiDgm6kXWf505N@cluster0.q8luy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+
+mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
-
-// Verify MongoDB connection
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-  console.log('Connected to MongoDB');
-});
+})
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => {
+    console.error('Error connecting to MongoDB', err);
+    process.exit(1);  // Exit with failure
+  });
 
 // Define a Workout Schema
 const workoutSchema = new mongoose.Schema({
@@ -65,6 +65,11 @@ app.post('/api/workouts', async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
+});
+
+// Root route
+app.get('/', (req, res) => {
+  res.send('Weightlifting API is running');
 });
 
 // Start the server
