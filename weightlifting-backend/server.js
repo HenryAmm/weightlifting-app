@@ -33,6 +33,7 @@ const workoutSchema = new mongoose.Schema({
   exercise: String,
   weight: Number,
   reps: Number,
+  sets: Number,  // Add the new field for sets
   date: { type: Date, default: Date.now },
 });
 const Workout = mongoose.model('Workout', workoutSchema);
@@ -48,11 +49,11 @@ app.get('/api/workouts', async (req, res) => {
 });
 
 app.post('/api/workouts', async (req, res) => {
-  const { exercise, weight, reps } = req.body;
   const workout = new Workout({
-    exercise,
-    weight,
-    reps,
+    exercise: req.body.exercise,
+    weight: req.body.weight,
+    reps: req.body.reps,
+    sets: req.body.sets,  // Handle sets
   });
 
   try {

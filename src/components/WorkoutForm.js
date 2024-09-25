@@ -4,13 +4,15 @@ function WorkoutForm({ onSubmit }) {
   const [exercise, setExercise] = useState('');
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
+  const [sets, setSets] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ exercise, weight, reps });
+    onSubmit({ exercise, weight, reps, sets });
     setExercise('');
     setWeight('');
     setReps('');
+    setSets('');
   };
 
   return (
@@ -45,6 +47,17 @@ function WorkoutForm({ onSubmit }) {
           onChange={(e) => setReps(e.target.value)}
           className="border rounded p-2 w-full"
           placeholder="e.g., 10"
+          required
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block mb-2">Sets</label>
+        <input
+          type="number"
+          value={sets}
+          onChange={(e) => setSets(e.target.value)}
+          className="border rounded p-2 w-full"
+          placeholder="e.g., 4"
           required
         />
       </div>
