@@ -18,7 +18,7 @@ app.use(cors({
 }));
 
 // MongoDB connection
-const MONGO_URI = process.env.MONGO_URI || 'your-mongodb-uri';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://henryamm:S9uiDgm6kXWf505N@cluster0.q8luy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
