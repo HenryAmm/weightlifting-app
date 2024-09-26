@@ -23,8 +23,18 @@ db.once('open', () => {
   console.log('Connected to MongoDB Atlas');
 });
 
-// Define the workout schema
+// Define the User schema
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },  // Each username must be unique
+  createdAt: { type: Date, default: Date.now },
+});
+
+// User model
+const User = mongoose.model('User', userSchema);
+
+// Define the Workout schema, associating workouts with a user
 const workoutSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Reference to the user
   exercise: String,
   weight: Number,
   reps: Number,
@@ -37,26 +47,73 @@ const Workout = mongoose.model('Workout', workoutSchema);
 
 // Routes
 
-// Get all workouts
-app.get('/api/workouts', async (req, res) => {
+// Get all users from the database
+app.get('/api/users', async (req, res) => {
   try {
-    const workouts = await Workout.find();
+    const users = await User.find();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Add a new user to the database
+app.post('/api/users', async (req, res) => {
+  const { username } = req.body;
+
+  // Ensure the username doesn't already exist
+  try {
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    const newUser = new User({ username });
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Delete a user by ID
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Optionally, delete the workouts associated with this user
+    await Workout.deleteMany({ user: req.params.id });
+
+    res.status(200).json({ message: 'User and associated workouts deleted successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all workouts for a specific user
+app.get('/api/workouts/:userId', async (req, res) => {
+  try {
+    const workouts = await Workout.find({ user: req.params.userId });
     res.json(workouts);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Create or update a workout
+// Create or update a workout for a specific user
 app.post('/api/workouts', async (req, res) => {
-  const { exercise, weight, reps, sets } = req.body;
+  const { user, exercise, weight, reps, sets } = req.body;
 
   try {
-    // Find an existing workout by exercise name and update it, or insert a new one if it doesn't exist
     const updatedWorkout = await Workout.findOneAndUpdate(
-      { exercise: exercise },  // Find workout by exercise name
+      { user, exercise },  // Find by user and exercise
       { $set: { weight, reps, sets } },  // Update weight, reps, and sets
-      { new: true, upsert: true }  // Create new workout if it doesn't exist
+      { new: true, upsert: true }  // Create if it doesn't exist
     );
     res.status(201).json(updatedWorkout);
   } catch (err) {
@@ -67,8 +124,7 @@ app.post('/api/workouts', async (req, res) => {
 // Delete a workout by ID
 app.delete('/api/workouts/:id', async (req, res) => {
   try {
-    const id = mongoose.Types.ObjectId(req.params.id);  // Convert ID to ObjectId
-    const workout = await Workout.findByIdAndDelete(id);
+    const workout = await Workout.findByIdAndDelete(req.params.id);
 
     if (!workout) {
       return res.status(404).json({ message: 'Workout not found' });

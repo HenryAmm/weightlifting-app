@@ -11,39 +11,35 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 function App() {
   const [workouts, setWorkouts] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);  // Track the current user by their _id
 
-  // Fetch workouts from the backend when the app loads
+  // Fetch workouts for the current user
   useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/workouts`);
-        setWorkouts(response.data);
-      } catch (error) {
-        console.error('Error fetching workouts:', error);
-      }
-    };
+    if (currentUser) {
+      const fetchWorkouts = async () => {
+        try {
+          const response = await axios.get(`${API_URL}/workouts/${currentUser}`);
+          setWorkouts(response.data);
+        } catch (error) {
+          console.error('Error fetching workouts:', error);
+        }
+      };
 
-    fetchWorkouts();
-  }, []);
+      fetchWorkouts();
+    }
+  }, [currentUser]);
 
-  // Handle adding or updating a workout
   const handleWorkoutSubmit = async (newWorkout) => {
     try {
-      const response = await axios.post(`${API_URL}/workouts`, newWorkout);
-
-      // Update the workout log in the state (add new or update existing workout)
-      const updatedWorkout = response.data;
+      const response = await axios.post(`${API_URL}/workouts`, { ...newWorkout, user: currentUser });
       setWorkouts((prevWorkouts) => {
-        const existingWorkoutIndex = prevWorkouts.findIndex(workout => workout.exercise === updatedWorkout.exercise);
-
+        const existingWorkoutIndex = prevWorkouts.findIndex(workout => workout.exercise === response.data.exercise);
         if (existingWorkoutIndex !== -1) {
-          // Update the existing workout in the state
           const updatedWorkouts = [...prevWorkouts];
-          updatedWorkouts[existingWorkoutIndex] = updatedWorkout;
+          updatedWorkouts[existingWorkoutIndex] = response.data;
           return updatedWorkouts;
         } else {
-          // Add new workout to the state
-          return [...prevWorkouts, updatedWorkout];
+          return [...prevWorkouts, response.data];
         }
       });
     } catch (error) {
@@ -51,19 +47,9 @@ function App() {
     }
   };
 
-  // Handle deleting a workout
-  const handleDeleteWorkout = async (id) => {
-    try {
-      await axios.delete(`${API_URL}/workouts/${id}`);
-      setWorkouts((prevWorkouts) => prevWorkouts.filter(workout => workout._id !== id));
-    } catch (error) {
-      console.error('Error deleting workout:', error);
-    }
-  };
-
   return (
     <Router>
-      <Header />
+      <Header currentUser={currentUser} setCurrentUser={setCurrentUser} />
       <div className="container mx-auto p-4">
         <Routes>
           <Route
@@ -72,7 +58,7 @@ function App() {
           />
           <Route
             path="/log"
-            element={<WorkoutLog workouts={workouts} setWorkouts={setWorkouts} onDeleteWorkout={handleDeleteWorkout} />}
+            element={<WorkoutLog workouts={workouts} setWorkouts={setWorkouts} />}
           />
         </Routes>
       </div>
