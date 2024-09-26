@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { TrashIcon } from '@heroicons/react/24/solid';  // Importing the trash icon
 
 function Header({ currentUser, setCurrentUser }) {
   const [users, setUsers] = useState([]);
   const [newUsername, setNewUsername] = useState('');
+  const [showModal, setShowModal] = useState(false);  // For controlling the modal visibility
 
   useEffect(() => {
     // Fetch users from the database
@@ -17,10 +19,15 @@ function Header({ currentUser, setCurrentUser }) {
 
   const handleAddUser = async () => {
     if (newUsername) {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users`, { username: newUsername });
-      setUsers([...users, response.data]);
-      setCurrentUser(response.data._id);
-      setNewUsername('');
+      try {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/users`, { username: newUsername });
+        setUsers([...users, response.data]);
+        setCurrentUser(response.data._id);
+        setNewUsername('');
+        setShowModal(false);  // Close the modal after user is added
+      } catch (error) {
+        console.error('Error adding user:', error);
+      }
     }
   };
 
@@ -36,6 +43,15 @@ function Header({ currentUser, setCurrentUser }) {
     }
   };
 
+  const handleSelectChange = (e) => {
+    const value = e.target.value;
+    if (value === 'add_new') {
+      setShowModal(true);  // Open the modal when "Add new user" is selected
+    } else {
+      setCurrentUser(value);
+    }
+  };
+
   return (
     <header className="bg-blue-600 p-4 text-white flex justify-between items-center">
       <div className="flex items-center">
@@ -48,7 +64,7 @@ function Header({ currentUser, setCurrentUser }) {
       <div className="flex items-center">
         <select
           value={currentUser || ''}
-          onChange={(e) => setCurrentUser(e.target.value)}
+          onChange={handleSelectChange}
           className="mr-4 p-2 bg-white text-black rounded"
         >
           <option value="" disabled>Select a user</option>
@@ -57,21 +73,48 @@ function Header({ currentUser, setCurrentUser }) {
               {user.username}
             </option>
           ))}
+          <option value="add_new">Add new user</option> {/* "Add new user" option */}
         </select>
-        <input
-          type="text"
-          value={newUsername}
-          onChange={(e) => setNewUsername(e.target.value)}
-          placeholder="Add new user"
-          className="p-2 rounded"
-        />
-        <button onClick={handleAddUser} className="ml-2 bg-green-500 text-white p-2 rounded">
-          Add User
-        </button>
-        <button onClick={handleDeleteUser} className="ml-2 bg-red-500 text-white p-2 rounded">
-          Delete User
-        </button>
+
+        {/* Recycle bin icon for deleting the user */}
+        {currentUser && (
+          <button onClick={handleDeleteUser} className="ml-2 text-white hover:text-red-500">
+            <TrashIcon className="h-6 w-6" />
+          </button>
+        )}
       </div>
+
+      {/* Modal for adding a new user */}
+      {showModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 text-center">
+            <div className="bg-white rounded-lg text-left shadow-xl p-6">
+              <h2 className="text-xl font-bold mb-4">Add New User</h2>
+              <input
+                type="text"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                placeholder="Enter username"
+                className="p-2 border rounded w-full mb-4"
+              />
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowModal(false)}  // Close the modal
+                  className="mr-2 bg-gray-500 text-white p-2 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddUser}  // Submit the new user
+                  className="bg-green-500 text-white p-2 rounded"
+                >
+                  Add User
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
