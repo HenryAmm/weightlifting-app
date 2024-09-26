@@ -1,44 +1,43 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');  // For serving the React build
 
-// Initialize Express
+// Initialize the Express app
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = 5001;
 
-// Middleware to parse JSON
-app.use(express.json());
+// Middleware
+app.use(cors());  // Enable CORS for all origins
+app.use(express.json());  // Parse incoming JSON requests
 
-// CORS settings - allow localhost and Netlify origin
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://henchry.netlify.app'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
-}));
-
-// MongoDB connection
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://henryamm:S9uiDgm6kXWf505N@cluster0.q8luy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-mongoose.connect(MONGO_URI, {
+// Connect to MongoDB Atlas
+mongoose.connect('mongodb+srv://henryamm:S9uiDgm6kXWf505N@cluster0.q8luy.mongodb.net/weightlifting?retryWrites=true&w=majority&appName=Cluster0', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => console.log('Connected to MongoDB'))
-  .catch(err => {
-    console.error('Error connecting to MongoDB', err);
-    process.exit(1);
-  });
+});
 
-// Workout Schema
+// MongoDB connection check
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+  console.log('Connected to MongoDB Atlas');
+});
+
+// Define the workout schema
 const workoutSchema = new mongoose.Schema({
   exercise: String,
   weight: Number,
   reps: Number,
-  sets: Number,  // Add the new field for sets
+  sets: Number,
   date: { type: Date, default: Date.now },
 });
+
+// Workout model
 const Workout = mongoose.model('Workout', workoutSchema);
 
-// API routes
+// Routes
+
+// Get all workouts
 app.get('/api/workouts', async (req, res) => {
   try {
     const workouts = await Workout.find();
@@ -48,28 +47,38 @@ app.get('/api/workouts', async (req, res) => {
   }
 });
 
+// Create or update a workout
 app.post('/api/workouts', async (req, res) => {
-  const workout = new Workout({
-    exercise: req.body.exercise,
-    weight: req.body.weight,
-    reps: req.body.reps,
-    sets: req.body.sets,  // Handle sets
-  });
+  const { exercise, weight, reps, sets } = req.body;
 
   try {
-    const newWorkout = await workout.save();
-    res.status(201).json(newWorkout);
+    // Find an existing workout by exercise name and update it, or insert a new one if it doesn't exist
+    const updatedWorkout = await Workout.findOneAndUpdate(
+      { exercise: exercise },  // Find workout by exercise name
+      { $set: { weight, reps, sets } },  // Update weight, reps, and sets
+      { new: true, upsert: true }  // Create new workout if it doesn't exist
+    );
+    res.status(201).json(updatedWorkout);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
 
-// Serve static files from the React frontend app
-app.use(express.static(path.join(__dirname, 'build')));
+// Delete a workout by ID
+app.delete('/api/workouts/:id', async (req, res) => {
+  try {
+    const id = mongoose.Types.ObjectId(req.params.id);  // Convert ID to ObjectId
+    const workout = await Workout.findByIdAndDelete(id);
 
-// Catch-all route: Sends the React app for any route not handled by the API
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    if (!workout) {
+      return res.status(404).json({ message: 'Workout not found' });
+    }
+
+    res.status(200).json({ message: 'Workout deleted successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // Start the server
