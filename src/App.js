@@ -54,7 +54,7 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<HomePage onSubmit={handleWorkoutSubmit} />}
+            element={<HomePage workouts={workouts} onSubmit={handleWorkoutSubmit} />}
           />
           <Route
             path="/log"
