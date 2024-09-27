@@ -62,4 +62,7 @@ function App() {
   );
 }
 
+console.log('Environment:', process.env.NODE_ENV);
+
+
 export default App;
