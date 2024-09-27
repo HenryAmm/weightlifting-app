@@ -6,10 +6,10 @@ import WorkoutLog from './components/WorkoutLog';
 import HomePage from './pages/HomePage';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-// API base URL changes based on environment
+// API base URL dynamically switches between local and production
 const API_URL = process.env.NODE_ENV === 'production'
   ? '/.netlify/functions'
-  : 'http://localhost:5001/api';  // Local Node.js API in development
+  : 'http://localhost:5001/api';  // Use local Node.js API in development
 
 function App() {
   const [workouts, setWorkouts] = useState([]);
@@ -19,7 +19,8 @@ function App() {
     if (currentUser) {
       const fetchWorkouts = async () => {
         try {
-          const response = await axios.get(`${API_URL}/workouts/${currentUser}`);
+          // Use query parameter to send userId
+          const response = await axios.get(`${API_URL}/getWorkouts?userId=${currentUser}`);
           setWorkouts(response.data);
         } catch (error) {
           console.error('Error fetching workouts:', error);
@@ -32,8 +33,8 @@ function App() {
 
   const handleWorkoutSubmit = async (newWorkout) => {
     try {
-      const response = await axios.post(`${API_URL}/workouts`, { ...newWorkout, user: currentUser });
-      setWorkouts(prevWorkouts => {
+      const response = await axios.post(`${API_URL}/addWorkout`, { ...newWorkout, user: currentUser });
+      setWorkouts((prevWorkouts) => {
         const existingWorkoutIndex = prevWorkouts.findIndex(workout => workout.exercise === response.data.exercise);
         if (existingWorkoutIndex !== -1) {
           const updatedWorkouts = [...prevWorkouts];
@@ -61,8 +62,5 @@ function App() {
     </Router>
   );
 }
-
-console.log('Environment:', process.env.NODE_ENV);
-
 
 export default App;

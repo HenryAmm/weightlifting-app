@@ -23,6 +23,9 @@ db.once('open', () => {
   console.log('Connected to MongoDB Atlas');
 });
 
+// Check the database name in use
+console.log('Connected to database:', db);
+
 // Define the User schema
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },  // Each username must be unique
