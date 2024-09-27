@@ -11,8 +11,12 @@ function Header({ currentUser, setCurrentUser }) {
   useEffect(() => {
     // Fetch users from the database
     const fetchUsers = async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/users`);
-      setUsers(response.data);
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/users`);
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
     };
     fetchUsers();
   }, []);
@@ -20,7 +24,8 @@ function Header({ currentUser, setCurrentUser }) {
   const handleAddUser = async () => {
     if (newUsername) {
       try {
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/users`, { username: newUsername });
+        // Corrected POST request URL to /addUser
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/addUser`, { username: newUsername });
         setUsers([...users, response.data]);
         setCurrentUser(response.data._id);
         setNewUsername('');
