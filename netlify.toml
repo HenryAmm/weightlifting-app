@@ -1,0 +1,13 @@
+[build]
+  functions = "netlify/functions"
+
+[dev]
+  # This tells Netlify to forward frontend requests to your local Node.js backend in development
+  framework = "#custom"
+  command = "npm start"
+  targetPort = 3000
+
+[[redirects]]
+  from = "/api/*"
+  to = "http://localhost:5001/api/:splat"
+  status = 200

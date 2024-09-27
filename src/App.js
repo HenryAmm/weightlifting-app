@@ -6,14 +6,15 @@ import WorkoutLog from './components/WorkoutLog';
 import HomePage from './pages/HomePage';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-// Dynamically set the API base URL using environment variables
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+// API base URL changes based on environment
+const API_URL = process.env.NODE_ENV === 'production'
+  ? '/.netlify/functions'
+  : 'http://localhost:5001/api';  // Local Node.js API in development
 
 function App() {
   const [workouts, setWorkouts] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);  // Track the current user by their _id
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // Fetch workouts for the current user
   useEffect(() => {
     if (currentUser) {
       const fetchWorkouts = async () => {
@@ -32,7 +33,7 @@ function App() {
   const handleWorkoutSubmit = async (newWorkout) => {
     try {
       const response = await axios.post(`${API_URL}/workouts`, { ...newWorkout, user: currentUser });
-      setWorkouts((prevWorkouts) => {
+      setWorkouts(prevWorkouts => {
         const existingWorkoutIndex = prevWorkouts.findIndex(workout => workout.exercise === response.data.exercise);
         if (existingWorkoutIndex !== -1) {
           const updatedWorkouts = [...prevWorkouts];
@@ -52,14 +53,8 @@ function App() {
       <Header currentUser={currentUser} setCurrentUser={setCurrentUser} />
       <div className="container mx-auto p-4">
         <Routes>
-          <Route
-            path="/"
-            element={<HomePage workouts={workouts} onSubmit={handleWorkoutSubmit} />}
-          />
-          <Route
-            path="/log"
-            element={<WorkoutLog workouts={workouts} setWorkouts={setWorkouts} />}
-          />
+          <Route path="/" element={<HomePage workouts={workouts} onSubmit={handleWorkoutSubmit} />} />
+          <Route path="/log" element={<WorkoutLog workouts={workouts} setWorkouts={setWorkouts} />} />
         </Routes>
       </div>
       <Footer />
