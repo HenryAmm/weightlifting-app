@@ -35,7 +35,7 @@ function Header({ currentUser, setCurrentUser }) {
       }
     }
   };
-
+  
   const handleDeleteUser = async () => {
     if (currentUser) {
       try {
@@ -47,6 +47,7 @@ function Header({ currentUser, setCurrentUser }) {
       }
     }
   };
+  
 
   const handleSelectChange = (e) => {
     const value = e.target.value;

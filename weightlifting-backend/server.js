@@ -60,6 +60,25 @@ app.get('/api/getWorkouts', async (req, res) => {
   }
 });
 
+// Delete a workout
+app.delete('/api/workouts/:id', async (req, res) => {
+  const { id } = req.params;  // Extract workout ID from the URL
+
+  try {
+    console.log('Deleting workout with ID:', id);  // Log the workout ID to ensure it's correct
+    // Convert id to ObjectId before deleting
+    const deletedWorkout = await Workout.findByIdAndDelete(mongoose.Types.ObjectId(id));
+    if (!deletedWorkout) {
+      return res.status(404).json({ message: "Workout not found" });
+    }
+    res.status(200).json({ message: "Workout deleted successfully" });
+  } catch (err) {
+    console.error('Error deleting workout:', err);
+    res.status(500).json({ message: 'Error deleting workout', error: err });
+  }
+});
+
+
 // Add a new workout
 app.post('/api/addWorkout', async (req, res) => {
   const { exercise, weight, reps, sets, user } = req.body;
@@ -81,21 +100,24 @@ app.post('/api/addWorkout', async (req, res) => {
   }
 });
 
-// Delete a workout by its ID (ensure ObjectId is handled correctly)
-app.delete('/api/deleteWorkout', async (req, res) => {
-  const { workoutId } = req.body;  // Expect workoutId in the request body
-
+// Delete a user by ID
+app.delete('/api/users/:id', async (req, res) => {
+  const { id } = req.params;
+  
   try {
-    const deletedWorkout = await Workout.findByIdAndDelete(mongoose.Types.ObjectId(workoutId));  // Convert workoutId to ObjectId
-    if (!deletedWorkout) {
-      return res.status(404).json({ message: "Workout not found" });
+    console.log('Deleting user with ID:', id);  // Debugging log to check if the request is reaching this point
+    // Convert id to ObjectId before querying
+    const deletedUser = await User.findByIdAndDelete(mongoose.Types.ObjectId(id));  // Convert to ObjectId
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json({ message: "Workout deleted successfully" });
+    res.status(200).json({ message: "User deleted successfully" });
   } catch (err) {
-    console.error('Error deleting workout:', err);
-    res.status(500).json({ message: 'Error deleting workout', error: err });
+    console.error('Error deleting user:', err);
+    res.status(500).json({ message: 'Error deleting user', error: err });
   }
 });
+
 
 // Fetch all users
 app.get('/api/users', async (req, res) => {

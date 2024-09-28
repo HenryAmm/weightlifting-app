@@ -3,11 +3,10 @@ import axios from 'axios';
 
 function WorkoutLog({ workouts, setWorkouts }) {
 
-  const handleDelete = async (id) => {
+  const handleDeleteWorkout = async (workoutId) => {
     try {
-      await axios.delete(`http://localhost:5001/api/workouts/${id}`);
-      // Remove the workout from the state
-      setWorkouts((prevWorkouts) => prevWorkouts.filter(workout => workout._id !== id));
+      await axios.delete(`${process.env.REACT_APP_API_URL}/workouts/${workoutId}`);
+      setWorkouts(workouts.filter(workout => workout._id !== workoutId));  // Remove the workout from the local list
     } catch (error) {
       console.error('Error deleting workout:', error);
     }
@@ -26,7 +25,7 @@ function WorkoutLog({ workouts, setWorkouts }) {
                 {workout.exercise} - {workout.weight} kgs x {workout.reps} reps for {workout.sets} sets
               </div>
               <button
-                onClick={() => handleDelete(workout._id)}
+                onClick={() => handleDeleteWorkout(workout._id)}  // Corrected function name
                 className="text-red-500 hover:text-red-700"
               >
                 <TrashIcon className="h-5 w-5" />
