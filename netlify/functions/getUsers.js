@@ -6,7 +6,8 @@ let clientPromise = client.connect();
 const handler = async (event) => {
   try {
     const db = (await clientPromise).db(process.env.MONGODB_DATABASE);
-    const collection = db.collection(process.env.MONGODB_USERS_COLLECTION);  // Users collection
+    // Hardcoding the collection name for debugging
+    const collection = db.collection('users');  // Replace with the actual name of your users collection
 
     // Fetch all users
     const users = await collection.find({}).toArray();
