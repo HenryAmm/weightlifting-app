@@ -10,7 +10,20 @@ const PORT = process.env.PORT || 5001;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://henryamm:S9uiDgm6kXWf505N@cluster0.q8luy.mongodb.net/weightlifting?retryWrites=true&w=majority';
 
 // Middleware
-app.use(cors({ origin: 'http://localhost:3000' }));
+const allowedOrigins = [
+  'http://localhost:3000',    // Local development
+  'https://henchry.netlify.app'  // Your Netlify deployment
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
 app.use(bodyParser.json());
 
 // MongoDB connection
