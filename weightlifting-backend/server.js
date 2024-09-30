@@ -38,7 +38,7 @@ const WorkoutSchema = new mongoose.Schema({
   reps: Number,
   sets: Number,
   user: mongoose.Schema.Types.ObjectId,  // Store user as ObjectId
-  date: { type: Date, default: Date.now }
+  date: { type: Date, default: Date.now }  // Automatically capture the log date
 });
 
 const Workout = mongoose.model('Workout', WorkoutSchema);
@@ -99,7 +99,8 @@ app.post('/api/addWorkout', async (req, res) => {
     weight: Number(weight),
     reps: Number(reps),
     sets: Number(sets),
-    user: mongoose.Types.ObjectId(user)  // Convert userId to ObjectId when adding
+    user: mongoose.Types.ObjectId(user),  // Convert userId to ObjectId when adding
+    date: Date.now()  // Automatically log the current date
   });
 
   try {
@@ -110,6 +111,7 @@ app.post('/api/addWorkout', async (req, res) => {
     res.status(500).json({ message: 'Error adding workout', error: err });
   }
 });
+
 
 // Delete a user by ID
 app.delete('/api/users/:id', async (req, res) => {
