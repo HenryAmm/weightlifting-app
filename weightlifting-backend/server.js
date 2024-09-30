@@ -43,7 +43,7 @@ const WorkoutSchema = new mongoose.Schema({
 
 const Workout = mongoose.model('Workout', WorkoutSchema);
 
-// Define User schema (if necessary for handling users)
+// Define User schema
 const UserSchema = new mongoose.Schema({
   username: String,
   createdAt: { type: Date, default: Date.now }
@@ -62,7 +62,7 @@ app.get('/api/getWorkouts', async (req, res) => {
   console.log('Fetching workouts for userId:', userId);
 
   try {
-    const workouts = await Workout.find({ user: mongoose.Types.ObjectId(userId) });  // Convert userId to ObjectId
+    const workouts = await Workout.find({ user: mongoose.Types.ObjectId(userId) });
     if (!workouts.length) {
       return res.status(404).json({ message: "No workouts found for this user" });
     }
@@ -78,8 +78,7 @@ app.delete('/api/workouts/:id', async (req, res) => {
   const { id } = req.params;  // Extract workout ID from the URL
 
   try {
-    console.log('Deleting workout with ID:', id);  // Log the workout ID to ensure it's correct
-    // Convert id to ObjectId before deleting
+    console.log('Deleting workout with ID:', id);
     const deletedWorkout = await Workout.findByIdAndDelete(mongoose.Types.ObjectId(id));
     if (!deletedWorkout) {
       return res.status(404).json({ message: "Workout not found" });
@@ -90,7 +89,6 @@ app.delete('/api/workouts/:id', async (req, res) => {
     res.status(500).json({ message: 'Error deleting workout', error: err });
   }
 });
-
 
 // Add a new workout
 app.post('/api/addWorkout', async (req, res) => {
@@ -118,8 +116,7 @@ app.delete('/api/users/:id', async (req, res) => {
   const { id } = req.params;
   
   try {
-    console.log('Deleting user with ID:', id);  // Debugging log to check if the request is reaching this point
-    // Convert id to ObjectId before querying
+    console.log('Deleting user with ID:', id);
     const deletedUser = await User.findByIdAndDelete(mongoose.Types.ObjectId(id));  // Convert to ObjectId
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -130,7 +127,6 @@ app.delete('/api/users/:id', async (req, res) => {
     res.status(500).json({ message: 'Error deleting user', error: err });
   }
 });
-
 
 // Fetch all users
 app.get('/api/users', async (req, res) => {
@@ -145,7 +141,6 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ message: 'Error fetching users', error: err });
   }
 });
-
 
 // Add a new user
 app.post('/api/addUser', async (req, res) => {

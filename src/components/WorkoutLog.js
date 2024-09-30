@@ -1,17 +1,17 @@
-import { TrashIcon } from '@heroicons/react/24/solid';  // Updated import path for Heroicons v2
+import { TrashIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
 
 function WorkoutLog({ workouts, setWorkouts }) {
 
   const handleDeleteWorkout = async (workoutId) => {
-    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';  // Use REACT_APP_API_URL for Netlify, localhost for dev
-  
+    // Determine the base API URL from the environment variables
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+
     try {
-      // Adjust the endpoint depending on the environment
-      const endpoint = `${baseUrl}/workouts/${workoutId}`;
-  
-      await axios.delete(endpoint);
-      setWorkouts(workouts.filter(workout => workout._id !== workoutId));  // Update the local state
+      // Use the same URL structure for local and Netlify environments
+      await axios.delete(`${baseUrl}/workouts/${workoutId}`);
+      // Update the local state after deletion
+      setWorkouts(workouts.filter(workout => workout._id !== workoutId));
     } catch (error) {
       console.error('Error deleting workout:', error);
     }
@@ -30,7 +30,7 @@ function WorkoutLog({ workouts, setWorkouts }) {
                 {workout.exercise} - {workout.weight} kgs x {workout.reps} reps for {workout.sets} sets
               </div>
               <button
-                onClick={() => handleDeleteWorkout(workout._id)}  // Corrected function name
+                onClick={() => handleDeleteWorkout(workout._id)}
                 className="text-red-500 hover:text-red-700"
               >
                 <TrashIcon className="h-5 w-5" />
