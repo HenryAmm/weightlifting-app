@@ -4,15 +4,18 @@ import axios from 'axios';
 function WorkoutLog({ workouts, setWorkouts }) {
 
   const handleDeleteWorkout = async (workoutId) => {
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';  // Use REACT_APP_API_URL for Netlify, localhost for dev
+  
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/deleteWorkout/${workoutId}`);
-      setWorkouts(workouts.filter(workout => workout._id !== workoutId));  // Remove the workout from the local state
+      // Adjust the endpoint depending on the environment
+      const endpoint = `${baseUrl}/workouts/${workoutId}`;
+  
+      await axios.delete(endpoint);
+      setWorkouts(workouts.filter(workout => workout._id !== workoutId));  // Update the local state
     } catch (error) {
       console.error('Error deleting workout:', error);
     }
   };
-  
-
 
   return (
     <section className="bg-white p-4 rounded shadow-md mt-4">
