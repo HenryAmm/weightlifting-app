@@ -18,7 +18,7 @@ function WorkoutLog({ workouts, setWorkouts }) {
   };
 
   return (
-    <section className="bg-white p-4 rounded shadow-md mt-4">
+    <section className="bg-indigo-950 p-4 rounded shadow-md mt-4">
       <h2 className="text-xl font-bold">Workout Log</h2>
       <ul className="mt-2">
         {workouts.length === 0 ? (
@@ -27,7 +27,7 @@ function WorkoutLog({ workouts, setWorkouts }) {
           workouts.map((workout) => (
             <li key={workout._id} className="mb-2 flex justify-between items-center">
               <div>
-                {workout.exercise} - {workout.weight} kgs x {workout.reps} reps for {workout.sets} sets
+                {workout.exercise} - {workout.weight} kg x {workout.reps} reps for {workout.sets} sets
               </div>
               <button
                 onClick={() => handleDeleteWorkout(workout._id)}

@@ -33,21 +33,16 @@ function App() {
 
   const handleWorkoutSubmit = async (newWorkout) => {
     try {
-      const response = await axios.post(`${API_URL}/addWorkout`, { ...newWorkout, user: currentUser });
-      setWorkouts((prevWorkouts) => {
-        const existingWorkoutIndex = prevWorkouts.findIndex(workout => workout.exercise === response.data.exercise);
-        if (existingWorkoutIndex !== -1) {
-          const updatedWorkouts = [...prevWorkouts];
-          updatedWorkouts[existingWorkoutIndex] = response.data;
-          return updatedWorkouts;
-        } else {
-          return [...prevWorkouts, response.data];
-        }
-      });
+      // POST request to add the new workout
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/addWorkout`, newWorkout);
+      
+      // Instead of mutating, append the new workout to the state
+      setWorkouts((prevWorkouts) => [...prevWorkouts, response.data]);
     } catch (error) {
-      console.error('Error adding/updating workout:', error);
+      console.error('Error adding workout:', error);
     }
   };
+  
 
   return (
     <Router>

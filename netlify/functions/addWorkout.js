@@ -10,6 +10,7 @@ const handler = async (event) => {
     const db = (await clientPromise).db(process.env.MONGODB_DATABASE);
     const collection = db.collection(process.env.MONGODB_COLLECTION);  // Workouts collection
 
+    // Create a new workout object to be logged, including the date
     const newWorkout = {
       exercise,
       weight: Number(weight),
@@ -19,8 +20,10 @@ const handler = async (event) => {
       date: new Date(),
     };
 
+    // Insert the new workout instance into the collection
     const result = await collection.insertOne(newWorkout);
 
+    // Return the newly created workout along with its ID
     return {
       statusCode: 201,
       headers: {
@@ -28,7 +31,7 @@ const handler = async (event) => {
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
       },
-      body: JSON.stringify({ ...newWorkout, _id: result.insertedId }),  // Return the newly created workout
+      body: JSON.stringify({ ...newWorkout, _id: result.insertedId }),
     };
   } catch (error) {
     return {

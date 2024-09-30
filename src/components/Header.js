@@ -64,9 +64,9 @@ function Header({ currentUser, setCurrentUser }) {
   };
 
   return (
-    <header className="bg-blue-600 p-4 text-white flex justify-between items-center">
+    <header className="bg-indigo-950 p-4 text-white flex justify-between items-center">
       <div className="flex items-center">
-        <h1 className="text-2xl font-bold">Weightlifting App</h1>
+        <h1 className="text-2xl font-bold">Henchry</h1>
         <nav className="ml-6">
           <Link to="/" className="text-white mr-4 hover:underline">Home</Link>
           <Link to="/log" className="text-white hover:underline">Workout Log</Link>

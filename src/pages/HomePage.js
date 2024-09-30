@@ -33,16 +33,15 @@ function HomePage({ workouts, onSubmit }) {
             <li>No workouts logged yet.</li>
           ) : (
             Object.keys(groupedWorkouts).map((exercise) => (
-              <li key={exercise} className="border p-4 rounded shadow">
+              <li key={exercise} className="bg-indigo-950 p-4 rounded shadow">
                 <h3 className="text-lg font-semibold">{exercise}</h3>
                 <ul className="ml-4">
                   {groupedWorkouts[exercise].map((workout) => (
                     <li key={workout._id} className="mb-2">
-                      <span className="font-semibold">
-                        {new Date(workout.date).toLocaleDateString()}: {calculate1RM(workout.weight, workout.reps, workout.sets)} kg
+                        {new Date(workout.date).toLocaleDateString()}: <span className="font-semibold">{calculate1RM(workout.weight, workout.reps, workout.sets)} kg
                       </span>
                       {' '}
-                      <span className="text-gray-600">
+                      <span className="text-gray-600 pl-2 text-sm">
                         ({workout.weight} kg x {workout.reps} reps x {workout.sets} sets)
                       </span>
                     </li>
