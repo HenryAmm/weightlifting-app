@@ -25,7 +25,11 @@ const handler = async (event) => {
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
       },
-      body: JSON.stringify(result.ops[0]),  // Return the newly created user
+      body: JSON.stringify({
+        _id: result.insertedId,  // Return the inserted user's ID
+        username: newUser.username,
+        createdAt: newUser.createdAt
+      }),
     };
   } catch (error) {
     return {

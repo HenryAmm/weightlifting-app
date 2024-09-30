@@ -24,17 +24,22 @@ function Header({ currentUser, setCurrentUser }) {
   const handleAddUser = async () => {
     if (newUsername) {
       try {
-        // Corrected POST request URL to /addUser
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/addUser`, { username: newUsername });
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/addUser`, {
+          username: newUsername
+        }, {
+          headers: {
+            'Content-Type': 'application/json'  // Ensure proper content type
+          }
+        });
         setUsers([...users, response.data]);
         setCurrentUser(response.data._id);
         setNewUsername('');
-        setShowModal(false);  // Close the modal after user is added
       } catch (error) {
         console.error('Error adding user:', error);
       }
     }
   };
+  
   
   const handleDeleteUser = async () => {
     if (currentUser) {
