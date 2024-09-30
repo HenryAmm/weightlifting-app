@@ -99,14 +99,14 @@ function Header({ currentUser, setCurrentUser }) {
       {showModal && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 text-center">
-            <div className="bg-white rounded-lg text-left shadow-xl p-6">
+            <div className="bg-indigo-950 rounded-lg text-left shadow-xl p-6">
               <h2 className="text-xl font-bold mb-4">Add New User</h2>
               <input
                 type="text"
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 placeholder="Enter username"
-                className="p-2 border rounded w-full mb-4"
+                className="p-2 border rounded w-full text-black mb-4"
               />
               <div className="flex justify-end">
                 <button

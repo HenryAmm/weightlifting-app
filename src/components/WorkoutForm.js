@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 function WorkoutForm({ onSubmit, workouts }) {
   const [exercise, setExercise] = useState('');
@@ -6,6 +6,8 @@ function WorkoutForm({ onSubmit, workouts }) {
   const [reps, setReps] = useState('');
   const [sets, setSets] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+  const dropdownRef = useRef(null);
+  const inputRef = useRef(null); // Ref for the input field
 
   // Filter workouts to get unique exercise suggestions
   useEffect(() => {
@@ -23,8 +25,26 @@ function WorkoutForm({ onSubmit, workouts }) {
 
   const handleSuggestionClick = (suggestion) => {
     setExercise(suggestion); // Set the clicked suggestion to the input
-    setSuggestions([]); // Hide the suggestions after selecting
+    setSuggestions([]); // Immediately hide the suggestions after selecting
   };
+
+  // Handle outside clicks
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        inputRef.current !== event.target
+      ) {
+        setSuggestions([]); // Close suggestions if clicking outside
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,12 +57,13 @@ function WorkoutForm({ onSubmit, workouts }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="relative">
+      <div className="relative" ref={dropdownRef}>
         <label htmlFor="exercise" className="block font-medium">
           Exercise
         </label>
         <input
           id="exercise"
+          ref={inputRef}
           type="text"
           value={exercise}
           onChange={(e) => setExercise(e.target.value)}
@@ -54,7 +75,10 @@ function WorkoutForm({ onSubmit, workouts }) {
             {suggestions.map((suggestion, index) => (
               <li
                 key={index}
-                onClick={() => handleSuggestionClick(suggestion)}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleSuggestionClick(suggestion);
+                }}
                 className="cursor-pointer p-2 hover:bg-indigo-100"
               >
                 {suggestion}
