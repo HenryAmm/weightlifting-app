@@ -5,12 +5,14 @@ function WorkoutLog({ workouts, setWorkouts }) {
 
   const handleDeleteWorkout = async (workoutId) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/workouts/${workoutId}`);
-      setWorkouts(workouts.filter(workout => workout._id !== workoutId));  // Remove the workout from the local list
+      await axios.delete(`${process.env.REACT_APP_API_URL}/deleteWorkout/${workoutId}`);
+      setWorkouts(workouts.filter(workout => workout._id !== workoutId));  // Remove the workout from the local state
     } catch (error) {
       console.error('Error deleting workout:', error);
     }
   };
+  
+
 
   return (
     <section className="bg-white p-4 rounded shadow-md mt-4">
