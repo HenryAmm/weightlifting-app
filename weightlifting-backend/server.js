@@ -34,11 +34,14 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
 // Define Workout schema
 const WorkoutSchema = new mongoose.Schema({
   exercise: String,
-  weight: Number,
-  reps: Number,
-  sets: Number,
+  sets: [
+    {
+      weight: Number,
+      reps: Number
+    }
+  ],
   user: mongoose.Schema.Types.ObjectId,  // Store user as ObjectId
-  date: { type: Date, default: Date.now }  // Automatically capture the log date
+  date: { type: Date, default: Date.now }
 });
 
 const Workout = mongoose.model('Workout', WorkoutSchema);
@@ -92,15 +95,12 @@ app.delete('/api/workouts/:id', async (req, res) => {
 
 // Add a new workout
 app.post('/api/addWorkout', async (req, res) => {
-  const { exercise, weight, reps, sets, user } = req.body;
+  const { exercise, sets, user } = req.body;  // Receive multiple sets in the request
 
   const newWorkout = new Workout({
     exercise,
-    weight: Number(weight),
-    reps: Number(reps),
-    sets: Number(sets),
-    user: mongoose.Types.ObjectId(user),  // Convert userId to ObjectId when adding
-    date: Date.now()  // Automatically log the current date
+    sets: sets.map((set) => ({ weight: Number(set.weight), reps: Number(set.reps) })),  // Ensure each set has correct data
+    user: mongoose.Types.ObjectId(user)  // Convert userId to ObjectId when adding
   });
 
   try {
@@ -111,6 +111,7 @@ app.post('/api/addWorkout', async (req, res) => {
     res.status(500).json({ message: 'Error adding workout', error: err });
   }
 });
+
 
 
 // Delete a user by ID

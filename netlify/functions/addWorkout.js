@@ -5,43 +5,33 @@ let clientPromise = client.connect();
 
 const handler = async (event) => {
   try {
-    const { exercise, weight, reps, sets, user } = JSON.parse(event.body);  // Parse the request body
-
     const db = (await clientPromise).db(process.env.MONGODB_DATABASE);
-    const collection = db.collection(process.env.MONGODB_COLLECTION);  // Workouts collection
+    const collection = db.collection(process.env.MONGODB_COLLECTION);
 
-    // Create a new workout object to be logged, including the date
+    // Parse the incoming request body
+    const body = JSON.parse(event.body);
+    const { exercise, sets, user } = body;
+
+    // Structure the workout with an array of sets
     const newWorkout = {
       exercise,
-      weight: Number(weight),
-      reps: Number(reps),
-      sets: Number(sets),
-      user: new ObjectId(user),  // Ensure userId is saved as ObjectId
-      date: new Date(),
+      sets: sets.map(set => ({ weight: Number(set.weight), reps: Number(set.reps) })),
+      user: new ObjectId(user),
+      date: new Date()
     };
 
-    // Insert the new workout instance into the collection
+    // Insert the workout into the database
     const result = await collection.insertOne(newWorkout);
 
-    // Return the newly created workout along with its ID
     return {
       statusCode: 201,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-      },
-      body: JSON.stringify({ ...newWorkout, _id: result.insertedId }),
+      body: JSON.stringify(result.ops[0]),
     };
   } catch (error) {
+    console.error('Error adding workout:', error);
     return {
       statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-      },
-      body: JSON.stringify({ message: error.message }),
+      body: JSON.stringify({ message: 'Error adding workout', error: error.message }),
     };
   }
 };
